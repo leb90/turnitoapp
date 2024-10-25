@@ -12,7 +12,7 @@ const SeleccionarTurno: React.FC = () => {
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date | null>(null);
   const [horariosDisponibles, setHorariosDisponibles] = useState<string[]>([]);
   const [horarioSeleccionado, setHorarioSeleccionado] = useState<string | null>(null);
-  const [duracion, setDuracion] = useState<number>(1); // Aquí está la duración que el usuario selecciona
+  const [duracion, setDuracion] = useState<number>(1); // Duración seleccionada
   const [loading, setLoading] = useState(false);
   const [paso, setPaso] = useState(1);
   const [mensajeConfirmacion, setMensajeConfirmacion] = useState<string | null>(null);
@@ -65,18 +65,14 @@ const SeleccionarTurno: React.FC = () => {
     setPaso(1); // Reiniciar los pasos cada vez que se abre el modal
   };
 
-  const manejarFechaSeleccionada = async (date: Date) => {
+  const manejarFechaSeleccionada = async (date: Date | null) => {
+    if (!date || !canchaSeleccionada) return;
     try {
       setFechaSeleccionada(date);
       setLoading(true);
 
-      if (!canchaSeleccionada) {
-        throw new Error("No se ha seleccionado ninguna cancha");
-      }
-
       const fechaString = date.toISOString().split('T')[0];
 
-      // Consulta a Firestore para obtener las reservas existentes para la fecha y la cancha seleccionada
       const q = query(
         collection(db, 'reservas'),
         where('fecha', '==', fechaString),
@@ -92,12 +88,10 @@ const SeleccionarTurno: React.FC = () => {
 
         const indiceHorario = horarios.indexOf(reserva.horario);
         if (reserva.duracion === 2 && indiceHorario + 1 < horarios.length) {
-          // Si la duración es 2 horas, bloquear también el siguiente horario
-          horariosOcupados.push(horarios[indiceHorario + 1]);
+          horariosOcupados.push(horarios[indiceHorario + 1]); // Bloquear el siguiente horario si la duración es 2 horas
         }
       });
 
-      // Filtrar los horarios disponibles
       const horariosDisponibles = horarios.filter(horario => !horariosOcupados.includes(horario));
       setHorariosDisponibles(horariosDisponibles);
     } catch (error) {
