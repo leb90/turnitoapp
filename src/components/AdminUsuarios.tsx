@@ -13,7 +13,7 @@ interface Usuario {
 }
 
 const AdminUsuarios: React.FC = () => {
-  const { user, isAdmin } = useAuth(); // Obtiene el usuario y verificación de admin desde el contexto
+  const { isAdmin } = useAuth(); // Obtiene el usuario y verificación de admin desde el contexto
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [editarDeuda, setEditarDeuda] = useState<string | null>(null);
   const [cantidadDeuda, setCantidadDeuda] = useState<string>(''); // Permitir negativos
