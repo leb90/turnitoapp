@@ -1,7 +1,9 @@
+// src/components/AdminUsuarios.tsx
 import React, { useEffect, useState } from 'react';
 import { collection, onSnapshot, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import Sidebar from '../components/Sidebar';
+import { useAuth } from '../context/AuthContext'; // Importa el contexto de autenticación
 
 interface Usuario {
   uid: string;
@@ -11,11 +13,14 @@ interface Usuario {
 }
 
 const AdminUsuarios: React.FC = () => {
+  const { user, isAdmin } = useAuth(); // Obtiene el usuario y verificación de admin desde el contexto
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
-  const [editarDeuda, setEditarDeuda] = useState<string | null>(null); // Para editar deuda
-  const [cantidadDeuda, setCantidadDeuda] = useState<string>(''); // Guardamos como string para manejar números negativos
+  const [editarDeuda, setEditarDeuda] = useState<string | null>(null);
+  const [cantidadDeuda, setCantidadDeuda] = useState<string>(''); // Permitir negativos
 
   useEffect(() => {
+    if (!isAdmin) return; // Asegura que solo los administradores accedan a esta vista
+
     // Escuchar los cambios en tiempo real en la colección de usuarios
     const unsubscribe = onSnapshot(collection(db, 'usuarios'), (snapshot) => {
       const usuariosList = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() })) as Usuario[];
@@ -23,14 +28,14 @@ const AdminUsuarios: React.FC = () => {
     });
 
     return () => unsubscribe(); // Limpieza del listener al desmontar el componente
-  }, []);
+  }, [isAdmin]);
 
   const modificarDeuda = async (uid: string) => {
     const usuarioRef = doc(db, 'usuarios', uid);
     const usuarioDoc = await getDoc(usuarioRef);
 
     if (usuarioDoc.exists()) {
-      const cantidad = parseFloat(cantidadDeuda); // Convertir el input string a número
+      const cantidad = parseFloat(cantidadDeuda);
       if (isNaN(cantidad)) {
         alert("Por favor ingresa un número válido");
         return;
@@ -39,11 +44,9 @@ const AdminUsuarios: React.FC = () => {
       const nuevaDeuda = (usuarioDoc.data()?.deuda || 0) + cantidad;
 
       // Actualizar la deuda del usuario
-      await updateDoc(usuarioRef, {
-        deuda: nuevaDeuda
-      });
+      await updateDoc(usuarioRef, { deuda: nuevaDeuda });
 
-      // Resetear el modo de edición y la cantidad
+      // Restablece el modo de edición y la cantidad de deuda
       setEditarDeuda(null);
       setCantidadDeuda('');
     } else {
@@ -58,12 +61,14 @@ const AdminUsuarios: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    
-    // Permitir solo números (incluyendo negativos)
     if (/^-?\d*$/.test(value)) {
       setCantidadDeuda(value);
     }
   };
+
+  if (!isAdmin) {
+    return <p>No tienes permisos para acceder a esta sección.</p>; // Bloquea el acceso si no es admin
+  }
 
   return (
     <div className="flex h-screen">
@@ -105,14 +110,12 @@ const AdminUsuarios: React.FC = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className="space-x-4">
-                    <button
-                      onClick={() => setEditarDeuda(usuario.uid)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300"
-                    >
-                      Modificar Deuda
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => setEditarDeuda(usuario.uid)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300"
+                  >
+                    Modificar Deuda
+                  </button>
                 )}
               </div>
             </li>

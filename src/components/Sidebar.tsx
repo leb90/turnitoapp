@@ -1,36 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Asegúrate de usar react-router
-import { signOut } from 'firebase/auth'; // Importar el método signOut
-import { auth, db } from '../firebaseConfig'; // Importar la autenticación desde Firebase
-import { doc, getDoc } from 'firebase/firestore'; // Firestore para obtener la info del usuario
+// src/components/Sidebar.tsx
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
+import { useAuth } from '../context/AuthContext'; // Importa el contexto de autenticación
 
 const Sidebar: React.FC = () => {
-  const navigate = useNavigate(); // Hook de React Router para redirigir después de logout
-  const user = auth.currentUser; // Usuario actual
-  const [isAdmin, setIsAdmin] = useState<boolean>(false); // Estado para verificar si es admin
-
-  // Verificar si el usuario es administrador
-  useEffect(() => {
-    const verificarAdmin = async () => {
-      if (user) {
-        const usuarioRef = doc(db, 'usuarios', user.uid); // Referencia al documento del usuario
-        const usuarioDoc = await getDoc(usuarioRef); // Obtener el documento
-        if (usuarioDoc.exists() && usuarioDoc.data()?.admin) {
-          setIsAdmin(true); // Es administrador
-        } else {
-          setIsAdmin(false); // No es administrador
-        }
-      }
-    };
-
-    verificarAdmin();
-  }, [user]);
+  const { user, isAdmin } = useAuth(); // Obtén el usuario y el rol de administrador desde el contexto
+  const navigate = useNavigate();
 
   // Función para cerrar sesión
   const handleLogout = async () => {
     try {
-      await signOut(auth); // Cerrar sesión del usuario
-      navigate('/'); // Redirigir al login después de cerrar sesión
+      await signOut(auth);
+      navigate('/');
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
     }
@@ -44,7 +27,7 @@ const Sidebar: React.FC = () => {
         {user ? (
           <>
             <p>Bienvenido, {user.displayName}</p>
-            {isAdmin && <p className="text-green-400">Admin</p>} {/* Mostrar "Admin" si es administrador */}
+            {isAdmin && <p className="text-green-400">Admin</p>}
           </>
         ) : (
           'No has iniciado sesión.'

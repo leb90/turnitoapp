@@ -1,14 +1,14 @@
+// src/components/Login.tsx
 import React from 'react';
-import { signInWithPopup, UserCredential } from 'firebase/auth';
-import { auth, provider } from '../firebaseConfig';
+import { useAuth } from '../context/AuthContext';
 import '../Login.css';
 
 const Login: React.FC = () => {
+  const { signIn } = useAuth(); // Usa el hook useAuth para acceder a signIn
+
   const handleLogin = async () => {
     try {
-      const result: UserCredential = await signInWithPopup(auth, provider);
-      const user = result.user;
-      console.log('Usuario logueado: ', user);
+      await signIn(); // Llama a signIn desde el contexto
     } catch (error) {
       console.error('Error al iniciar sesión: ', error);
     }

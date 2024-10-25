@@ -2,10 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-
-interface DeudaProps {
-  user: any; // La prop user contiene la información del usuario autenticado
-}
+import { useAuth } from '../context/AuthContext'; // Importa el hook de autenticación
 
 interface DeudaInfo {
   deuda: boolean;
@@ -13,13 +10,16 @@ interface DeudaInfo {
   estado: string;
 }
 
-const Deuda: React.FC<DeudaProps> = ({ user }) => {
+const Deuda: React.FC = () => {
+  const { user } = useAuth(); // Obtiene el usuario desde el contexto
   const [deudaInfo, setDeudaInfo] = useState<DeudaInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDeuda = async () => {
-      const deudaRef = doc(db, 'deudas', user.uid); // Usamos el UID del usuario autenticado
+      if (!user) return; // Verifica que el usuario esté autenticado
+
+      const deudaRef = doc(db, 'deudas', user.uid); // Usa el UID del usuario autenticado
       const deudaSnap = await getDoc(deudaRef);
       if (deudaSnap.exists()) {
         setDeudaInfo(deudaSnap.data() as DeudaInfo);

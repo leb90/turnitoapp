@@ -1,18 +1,18 @@
 // src/pages/Dashboard.tsx
 import React, { useState, useEffect } from 'react';
-import { db, auth } from '../firebaseConfig';
+import { db } from '../firebaseConfig';
 import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import Sidebar from '../components/Sidebar';
 import ConfirmModal from '../components/ConfirmModal';
+import { useAuth } from '../context/AuthContext';
 
 const Dashboard: React.FC = () => {
+  const { user } = useAuth(); // Utiliza el contexto de usuario
   const [deuda, setDeuda] = useState<number | null>(null);
   const [misReservas, setMisReservas] = useState<any[]>([]);
   const [loadingDeuda, setLoadingDeuda] = useState(true);
   const [loadingReservas, setLoadingReservas] = useState(true);
-  const [mostrarModal, setMostrarModal] = useState(false); // Estado para controlar el modal
-
-  const user = auth.currentUser;
+  const [mostrarModal, setMostrarModal] = useState(false);
 
   // Obtener información de la deuda del usuario
   useEffect(() => {
@@ -23,9 +23,8 @@ const Dashboard: React.FC = () => {
       const data = usuarioSnap.data();
 
       if (data) {
-        setDeuda(data.deuda || 0); // Obtener el campo 'deuda'
+        setDeuda(data.deuda || 0);
       }
-
       setLoadingDeuda(false);
     };
 
@@ -36,14 +35,10 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const obtenerReservasUsuario = async () => {
       if (!user) return;
-      const q = query(
-        collection(db, 'reservas'),
-        where('uid', '==', user.uid)
-      );
+      const q = query(collection(db, 'reservas'), where('uid', '==', user.uid));
       const snapshot = await getDocs(q);
       const reservas = snapshot.docs.map(doc => doc.data());
 
-      // Filtrar solo las reservas futuras
       const reservasFuturas = reservas.filter((reserva) => {
         const fechaReserva = new Date(`${reserva.fecha}T${reserva.horario}`);
         const ahora = new Date();

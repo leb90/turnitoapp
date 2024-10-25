@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Calendar, { CalendarProps } from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import { db, auth } from '../firebaseConfig';
+import { db } from '../firebaseConfig';
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import Sidebar from '../components/Sidebar';
 import Modal from '../components/Modal';
+import { useAuth } from '../context/AuthContext'; // Importa el contexto de autenticación
 
 const SeleccionarTurno: React.FC = () => {
+  const { user } = useAuth(); // Usa el contexto para obtener el usuario actual
   const [canchaSeleccionada, setCanchaSeleccionada] = useState<string | null>(null);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date | null>(null);
@@ -16,14 +18,13 @@ const SeleccionarTurno: React.FC = () => {
   const [paso, setPaso] = useState(1);
   const [misReservas, setMisReservas] = useState<any[]>([]);
 
-  const user = auth.currentUser;
-
   const canchas = ["Fútbol 7", "Fútbol 11", "Tenis 1", "Tenis 2", "Paddle"];
   const horarios = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
 
   useEffect(() => {
     const obtenerReservasUsuario = async () => {
-      if (!user || !user.uid) return;
+      if (!user?.uid) return;
+
       try {
         const q = query(collection(db, 'reservas'), where('uid', '==', user.uid));
         const snapshot = await getDocs(q);
@@ -37,6 +38,7 @@ const SeleccionarTurno: React.FC = () => {
         console.error("Error al obtener las reservas: ", error);
       }
     };
+
     obtenerReservasUsuario();
   }, [user]);
 
