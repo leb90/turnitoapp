@@ -4,11 +4,11 @@ import { useAuth } from '../context/AuthContext';
 import '../Login.css';
 
 const Login: React.FC = () => {
-  const { signIn } = useAuth(); // Usa el hook useAuth para acceder a signIn
+  const { signIn } = useAuth();
 
   const handleLogin = async () => {
     try {
-      await signIn(); // Llama a signIn desde el contexto
+      await signIn();
     } catch (error) {
       console.error('Error al iniciar sesión: ', error);
     }

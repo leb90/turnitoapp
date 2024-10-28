@@ -2,20 +2,19 @@
 import React from 'react';
 
 interface ModalProps {
-  paso: number;
-  handleCerrarModal: () => void;
-  handleSiguiente: () => void;
-  handleAtras: () => void;
+  step: number;
+  handleCloseModal: () => void;
+  handleNext: () => void;
+  handleBack: () => void;
   children: React.ReactNode;
 }
 
-const Modal: React.FC<ModalProps> = ({ paso, handleCerrarModal, handleSiguiente, handleAtras, children }) => {
+const Modal: React.FC<ModalProps> = ({ step, handleCloseModal, handleNext, handleBack, children }) => {
   return (
     <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full relative">
-        {/* X para cerrar el modal */}
         <button
-          onClick={handleCerrarModal}
+          onClick={handleCloseModal}
           className="absolute top-3 right-3 text-gray-600 hover:text-gray-800"
         >
           ✖
@@ -23,21 +22,22 @@ const Modal: React.FC<ModalProps> = ({ paso, handleCerrarModal, handleSiguiente,
 
         {children}
 
-        {/* Botones de navegación */}
         <div className="mt-4 flex justify-between">
           <button
             className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg"
-            onClick={handleAtras}
-            disabled={paso === 1}  // Deshabilitar si es el primer paso
+            onClick={handleBack}
+            disabled={step === 1}
           >
-            Atrás
+            Back
           </button>
-          {paso < 3 && <button
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
-            onClick={handleSiguiente}
-          >
-             Siguiente
-          </button>}
+          {step < 3 && (
+            <button
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
+              onClick={handleNext}
+            >
+              Next
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -1,20 +1,22 @@
 // src/components/ConfirmModal.tsx
-import React from 'react';
+import React from "react";
 
 interface ConfirmModalProps {
-  mensaje: string;
+  message: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
-const ConfirmModal: React.FC<ConfirmModalProps> = ({ mensaje, onConfirm, onCancel }) => {
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  message,
+  onConfirm,
+  onCancel,
+}) => {
   return (
     <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative">
-        {/* Mensaje */}
-        <p className="text-lg font-medium text-gray-900 mb-4">{mensaje}</p>
+        <p className="text-lg font-medium text-gray-900 mb-4">{message}</p>
 
-        {/* Botones */}
         <div className="flex justify-end space-x-4">
           <button
             onClick={onCancel}

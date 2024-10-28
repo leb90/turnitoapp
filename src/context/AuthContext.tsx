@@ -21,12 +21,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   // Función para crear un usuario en Firestore si no existe
-  const crearUsuarioSiNoExiste = async (currentUser: User) => {
-    const usuarioRef = doc(db, 'usuarios', currentUser.uid);
-    const usuarioSnap = await getDoc(usuarioRef);
+  const createUserIfNotExist = async (currentUser: User) => {
+    const userRef = doc(db, 'usuarios', currentUser.uid);
+    const userSnap = await getDoc(userRef);
 
-    if (!usuarioSnap.exists()) {
-      await setDoc(usuarioRef, {
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
         nombre: currentUser.displayName,
         admin: false,
         deudaActiva: true,
@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const result = await signInWithPopup(auth, provider);
       const currentUser = result.user;
       setUser(currentUser);
-      await crearUsuarioSiNoExiste(currentUser);
+      await createUserIfNotExist(currentUser);
     } catch (error) {
       console.error("Error en el inicio de sesión:", error);
     }
@@ -55,10 +55,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUser(currentUser);
 
       if (currentUser) {
-        await crearUsuarioSiNoExiste(currentUser);
-        const usuarioRef = doc(db, 'usuarios', currentUser.uid);
-        const usuarioDoc = await getDoc(usuarioRef);
-        setIsAdmin(usuarioDoc.data()?.admin || false);
+        await createUserIfNotExist(currentUser);
+        const userRef = doc(db, 'usuarios', currentUser.uid);
+        const userDoc = await getDoc(userRef);
+        setIsAdmin(userDoc.data()?.admin || false);
       }
 
       setLoading(false);

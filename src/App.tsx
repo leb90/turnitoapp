@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/Login';
-import AdminUsuarios from './components/AdminUsuarios';
-import SeleccionarTurno from './components/SeleccionarTurno';
+import AdminUsuarios from './components/AdminUsers';
+import SeleccionarTurno from './components/SelectTurn';
 import Dashboard from './pages/Dashboard';
 
 const AppContent: React.FC = () => {
