@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 
 interface User {
   uid: string;
-  name: string;
+  nombre: string;
   debt: number;
   isAdmin: boolean;
 }
@@ -77,7 +77,7 @@ const AdminUsers: React.FC = () => {
           {users.map((user) => (
             <li key={user.uid} className="py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center">
               <div className="flex flex-col items-start sm:items-start mb-4 sm:mb-0 w-full sm:w-auto">
-                <p className="text-lg font-medium text-gray-800">{user.name}</p>
+                <p className="text-lg font-medium text-gray-800">{user.nombre}</p>
                 <p className={`text-sm ${user.debt > 0 ? 'text-red-500' : 'text-green-500'}`}>
                   Deuda: ${user.debt}
                 </p>
